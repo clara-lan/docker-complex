@@ -1,0 +1,64 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment: 
+      - POSTGRES_PASSWORD=postgres_password
+  redis:
+    image: 'redis:latest'
+  # nginx as router
+  nginx:
+    depends_on: 
+      - api
+      - client
+    # nomatter api server or worker crashes, always restart nginx to re-send requests
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80' # local port : docker container port
+  # line 11 suposed to be 'server', is the backend server set up
+  # in order not to confuse nginx in default.conf, use name api instead
+  api:
+    depends_on:
+      - postgres
+    build: 
+      #only name of the dockerfile, no path
+      dockerfile: Dockerfile.dev
+      # specify path in context
+      context: ./server
+    volumes:
+      # hold, so not overwrite node_modules inside the container
+      - /app/node_modules
+      # mapping server folder to app folder(inside container), each time visit /app will be routed to server
+      - ./server:/app
+    environment:
+      - REDIS_HOST=redis
+      #redis default port
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      #postgres default port
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes: 
+      - /app/node_modules
+      - ./worker:/app
+

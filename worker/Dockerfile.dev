@@ -1,0 +1,7 @@
+FROM node:14.14.0-alpine
+WORKDIR '/app'
+COPY ./package.json ./
+RUN npm install
+COPY . .
+# check package.json to see dev is mapping to nodemon, this will help to automatically reload app when code changes
+CMD ["npm", "run", "dev"] 
