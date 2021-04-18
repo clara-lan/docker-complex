@@ -18,7 +18,7 @@ after_success:
   - docker build -t aryawinterfell/complex-client ./client
   - docker build -t aryawinterfell/complex-nginx ./nginx
   - docker build -t aryawinterfell/complex-server ./server
-  -  docker build -t aryawinterfell/complex-worker ./worker
+  - docker build -t aryawinterfell/complex-worker ./worker
 # login to docker CI
 # echo: copy password and insert to after| (over -password-stdin)
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
