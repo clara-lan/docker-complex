@@ -1,0 +1,28 @@
+sudo: required
+services:
+  - docker
+
+#build test version and run some tests before install from clinet development dockerfile
+# docker build -t dockername/tagForCurrentContainer -f DevDockerFilePath BuildContextPath
+# all the tests(if exists) should add in before_install and run in script section
+before_install:
+  - docker build -t aryawinterfell/react-test -f ./client/Dockerfile.dev ./client
+
+# test actions
+script:
+  - docker run -e CI=true aryawinterfell/react-test npm test
+
+# after run script successfully
+after_success:
+  - docker build -t aryawinterfell/complex-client ./client
+  - docker build -t aryawinterfell/complex-nginx ./nginx
+  - docker build -t aryawinterfell/complex-server ./server
+  -  docker build -t aryawinterfell/complex-worker ./worker
+# login to docker CI
+# echo: copy password and insert to after| (over -password-stdin)
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+# take images built in after_success step and push them to docker hub
+  - docker push aryawinterfell-complex-client
+  - docker push aryawinterfell-complex-nginx
+  - docker push aryawinterfell-complex-server
+  - docker push aryawinterfell-complex-worker
