@@ -23,7 +23,7 @@ after_success:
 # echo: copy password and insert to after| (over -password-stdin)
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
 # take images built in after_success step and push them to docker hub
-  - docker push aryawinterfell-complex-client
-  - docker push aryawinterfell-complex-nginx
-  - docker push aryawinterfell-complex-server
-  - docker push aryawinterfell-complex-worker
+  - docker push aryawinterfell/complex-client
+  - docker push aryawinterfell/complex-nginx
+  - docker push aryawinterfell/complex-server
+  - docker push aryawinterfell/complex-worker
